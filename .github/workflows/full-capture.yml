@@ -1,0 +1,26 @@
+name: Full Resource Capture (MongoDB)
+
+on:
+  schedule:
+    - cron: '30 0 * * *'   # 6:00 AM IST (12:30 AM UTC) daily
+  workflow_dispatch:
+
+jobs:
+  full-capture:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - run: playwright install --with-deps chromium
+
+      - name: Run full capture
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: python full_capture.py
