@@ -12,7 +12,7 @@ DB_NAME = "website_archive"
 
 class MongoStorage:
     def __init__(self):
-        self.client = MongoClient(MONGO_URI)
+        self.client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000, connectTimeoutMS=10000)
         self.db = self.client[DB_NAME]
         self.bucket = GridFSBucket(self.db, bucket_name="resources")
         self.snapshots = self.db["snapshots"]
