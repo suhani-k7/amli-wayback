@@ -1,0 +1,5 @@
+2026-07-17T14:17:46.960917+05:30 - Page.screenshot: Timeout 30000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+  - fonts loaded
