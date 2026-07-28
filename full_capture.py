@@ -295,96 +295,136 @@ def capture_url(page, url: str):
     # Register response listener
     page.on("response", handle_response)
     
-    try:
-        # Load page
-        response = page.goto(url, wait_until="load", timeout=120000)
-        
-        # Auto-scroll to trigger lazy loading
-        print("  Triggering lazy loading via auto-scroll...")
-        scroll_to_bottom(page)
-        
-        # Wait for dynamic requests to finish
-        print("  Waiting for network to settle...")
-        try:
-            page.wait_for_load_state("networkidle", timeout=10000)
-        except Exception:
-            pass
-            
-        # Get final page URL after redirects
-        final_url = page.url
-        
-        # Scroll back to top
-        page.evaluate("window.scrollTo(0, 0)")
-        page.wait_for_timeout(500)
-        
-        # Retrieve final HTML content
-        html_content = page.content()
-        
-        # Build resource lookup map (absolute original URL -> absolute local path)
-        resource_map = {}
-        for original_url, details in captured_resources.items():
-            rel_path = details["rel_path"]
-            resource_map[original_url] = rel_path
-            stripped_url = strip_url_params(original_url)
-            if stripped_url not in resource_map:
-                resource_map[stripped_url] = rel_path
-                
-        # Rewrite captured CSS files in-place
-        print(f"  Rewriting url(...) links in {len(captured_resources)} resources...")
-        for orig_res_url, details in captured_resources.items():
-            if details["category"] == "css":
-                css_rel_path = details["rel_path"]
-                css_local_folder = os.path.dirname(css_rel_path)
-                try:
-                    css_text = details["data"].decode("utf-8", errors="ignore")
-                    rewritten_css = rewrite_css_urls(css_text, orig_res_url, css_local_folder, resource_map)
-                    details["data"] = rewritten_css.encode("utf-8")
-                except Exception as css_err:
-                    print(f"    Failed to rewrite CSS resource {css_rel_path}: {css_err}")
-                    
-        # Rewrite index.html references
-        print("  Rewriting links inside index.html...")
-        rewritten_html = rewrite_html_content(html_content, final_url, resource_map, ".")
+    # Retry loop for capturing URL
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        captured_resources.clear()
+        failed_resources.clear()
 
-        
-        # Save index.html
-        # Save every captured resource (now rewritten where applicable) to local disk
-        for orig_res_url, details in captured_resources.items():
-            storage.save_resource(
-                site=sanitized_domain,
-                date=TODAY,
-                rel_path=details["rel_path"],
-                data=details["data"],
-                content_type=details["content_type"],
-                original_url=orig_res_url,
-                category=details["category"],
+        try:
+            # Load page
+            response = page.goto(url, wait_until="load", timeout=120000)
+
+            status = response.status if response else 0
+            body_text = ""
+            try:
+                body_text = page.content()
+            except Exception:
+                pass
+
+            # Detect CloudFront or Origin 504 / 503 / 502 errors
+            is_origin_error = (
+                status in [500, 502, 503, 504] or
+                "504 ERROR" in body_text or
+                "CloudFront attempted to establish a connection" in body_text or
+                "Service Temporarily Unavailable" in body_text
             )
 
-        # Save the rewritten index.html to local disk
-        index_html_id = storage.save_index_html(sanitized_domain, TODAY, rewritten_html)
+            if is_origin_error and attempt < max_retries:
+                print(f"  ⚠️ Warning: Received origin error (HTTP {status}) on attempt {attempt}/{max_retries}. Retrying in 4s...")
+                page.wait_for_timeout(4000)
+                continue
 
-        # Save resource map + status info as the snapshot's metadata document
-        debug_resource_map = {orig_url: details["rel_path"] for orig_url, details in captured_resources.items()}
-        storage.save_snapshot_metadata(
-            site=sanitized_domain,
-            date=TODAY,
-            url=url,
-            status_code=response.status if response else None,
-            resource_map=debug_resource_map,
-            failed_resources=failed_resources,
-            captured_count=len(captured_resources),
-            failed_count=len(failed_resources),
-            index_html_id=index_html_id,
-        )
+            if is_origin_error:
+                print(f"  ✗ Failed to archive {url}: Origin error HTTP {status} persisted after {max_retries} attempts.")
+                return
 
-        print(f"  ✓ Successfully completed: {len(captured_resources)} resources saved, {len(failed_resources)} failed.")
+            # Auto-scroll to trigger lazy loading
+            print("  Triggering lazy loading via auto-scroll...")
+            scroll_to_bottom(page)
 
-    except Exception as e:
-        print(f"  ✗ Failed to archive page {url}: {e}")
+            # Wait for dynamic requests to finish
+            print("  Waiting for network to settle...")
+            try:
+                page.wait_for_load_state("networkidle", timeout=10000)
+            except Exception:
+                pass
 
-    finally:
-        # Deregister response listener
-        page.remove_listener("response", handle_response)
+            # Get final page URL after redirects
+            final_url = page.url
+
+            # Scroll back to top
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(500)
+
+            # Take high-res screenshot
+            try:
+                snap_dir = storage._get_snapshot_dir(sanitized_domain, TODAY)
+                snap_dir.mkdir(parents=True, exist_ok=True)
+                page.screenshot(path=str(snap_dir / "screenshot.png"), full_page=False)
+            except Exception as ss_err:
+                print(f"  Warning: screenshot failed: {ss_err}")
+
+            # Retrieve final HTML content
+            html_content = page.content()
+
+            # Build resource lookup map (absolute original URL -> absolute local path)
+            resource_map = {}
+            for original_url, details in captured_resources.items():
+                rel_path = details["rel_path"]
+                resource_map[original_url] = rel_path
+                stripped_url = strip_url_params(original_url)
+                if stripped_url not in resource_map:
+                    resource_map[stripped_url] = rel_path
+
+            # Rewrite captured CSS files in-place
+            print(f"  Rewriting url(...) links in {len(captured_resources)} resources...")
+            for orig_res_url, details in captured_resources.items():
+                if details["category"] == "css":
+                    css_rel_path = details["rel_path"]
+                    css_local_folder = os.path.dirname(css_rel_path)
+                    try:
+                        css_text = details["data"].decode("utf-8", errors="ignore")
+                        rewritten_css = rewrite_css_urls(css_text, orig_res_url, css_local_folder, resource_map)
+                        details["data"] = rewritten_css.encode("utf-8")
+                    except Exception as css_err:
+                        print(f"    Failed to rewrite CSS resource {css_rel_path}: {css_err}")
+
+            # Rewrite index.html references
+            print("  Rewriting links inside index.html...")
+            rewritten_html = rewrite_html_content(html_content, final_url, resource_map, ".")
+
+            # Save index.html
+            # Save every captured resource (now rewritten where applicable) to local disk
+            for orig_res_url, details in captured_resources.items():
+                storage.save_resource(
+                    site=sanitized_domain,
+                    date=TODAY,
+                    rel_path=details["rel_path"],
+                    data=details["data"],
+                    content_type=details["content_type"],
+                    original_url=orig_res_url,
+                    category=details["category"],
+                )
+
+            # Save the rewritten index.html to local disk
+            index_html_id = storage.save_index_html(sanitized_domain, TODAY, rewritten_html)
+
+            # Save resource map + status info as the snapshot's metadata document
+            debug_resource_map = {orig_url: details["rel_path"] for orig_url, details in captured_resources.items()}
+            storage.save_snapshot_metadata(
+                site=sanitized_domain,
+                date=TODAY,
+                url=url,
+                status_code=response.status if response else None,
+                resource_map=debug_resource_map,
+                failed_resources=failed_resources,
+                captured_count=len(captured_resources),
+                failed_count=len(failed_resources),
+                index_html_id=index_html_id,
+            )
+
+            print(f"  ✓ Successfully completed: {len(captured_resources)} resources saved, {len(failed_resources)} failed.")
+            break
+
+        except Exception as e:
+            if attempt < max_retries:
+                print(f"  Attempt {attempt} failed: {e}. Retrying...")
+                page.wait_for_timeout(3000)
+            else:
+                print(f"  ✗ Failed to archive page {url} after {max_retries} attempts: {e}")
+        finally:
+            page.remove_listener("response", handle_response)
 
 def main():
     print("========================================")

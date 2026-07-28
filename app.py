@@ -84,18 +84,42 @@ def api_get_snapshots(site):
 
 
 # ---------------------------------------------------------------------------
-# Snapshot viewer — stream HTML + resources from GridFS
+# Snapshot viewer — stream HTML + resources from local disk
 # ---------------------------------------------------------------------------
 
 @app.route("/view/<site>/<date>/")
 def view_snapshot(site, date):
     snap = storage.get_snapshot(site, date)
     if not snap:
-        abort(404, description=f"No snapshot found for site='{site}' date='{date}'")
-    html = storage.get_index_html(site, date)  # always use site slug (indexHtmlGridFsId was MongoDB-only)
+        # Try to see if site directory exists even if metadata is missing
+        dates = storage.get_snapshot_dates(site)
+        if not dates or date not in dates:
+            abort(404, description=f"No snapshot found for site='{site}' date='{date}'")
+
+    html = storage.get_index_html(site, date)
     if not html:
         abort(404, description=f"index.html not found for site='{site}' date='{date}'")
+
+    # Rewrite absolute live domain URLs (e.g. https://neouat.axismaxlife.com/...) to root-relative paths
+    # so that all resource requests go through local Flask app rather than bypassing to live server
+    html = re.sub(r'https?://(?:neouat|www)\.axismaxlife\.com/', '/', html)
+
+    # Inject <base href="/view/<site>/<date>/"> into <head> if not already present
+    base_tag = f'<base href="/view/{site}/{date}/">'
+    if "<head>" in html and "<base " not in html:
+        html = html.replace("<head>", f"<head>\n  {base_tag}", 1)
+    elif "<head " in html and "<base " not in html:
+        html = re.sub(r"(<head[^>]*>)", r"\1\n  " + base_tag, html, count=1)
+
     return Response(html, mimetype="text/html")
+
+
+@app.route("/view/<site>/<date>/screenshot")
+def view_screenshot(site, date):
+    data = storage.get_screenshot(site, date)
+    if not data:
+        abort(404, description=f"Screenshot not found for site='{site}' date='{date}'")
+    return Response(data, mimetype="image/png")
 
 
 @app.route("/view/<site>/<date>/resources/<category>/<filename>")
@@ -103,8 +127,52 @@ def view_resource(site, date, category, filename):
     rel_path = f"resources/{category}/{filename}"
     data, content_type = storage.get_resource(site, date, rel_path)
     if data is None:
+        # Fallback to search in all resource subdirectories and dates
+        data, content_type = storage.find_resource(site, date, filename)
+    if data is None:
         abort(404, description=f"Resource not found: {rel_path}")
     return Response(data, mimetype=content_type)
+
+
+# ---------------------------------------------------------------------------
+# Catch-all asset resolver — handles root paths (e.g. /corp-static/..., /_next/...)
+# requested by nested elements or CSS using Referer header or global search
+# ---------------------------------------------------------------------------
+
+@app.route("/<path:path>")
+def catchall_asset_resolver(path):
+    # Ignore API routes and static frontend files
+    if path.startswith("api/") or path.startswith("static/"):
+        abort(404)
+
+    site, date = "", ""
+    referer = request.headers.get("Referer", "")
+    match = re.search(r"/view/([^/]+)/([^/]+)/", referer)
+    if match:
+        site, date = match.group(1), match.group(2)
+
+    # Search snapshot resources for this asset path or filename across current & historical archives
+    data, content_type = storage.find_resource(site, date, path)
+    if data is not None:
+        return Response(data, mimetype=content_type)
+
+    # Clean fallbacks for missing assets
+    if path.endswith(".css"):
+        # Attempt fallback to ANY css file in the site archive so the layout doesn't break
+        data, content_type = storage.find_resource(site, date, ".css")
+        if data is not None:
+            return Response(data, mimetype="text/css")
+        return Response("/* fallback style */", mimetype="text/css")
+    elif path.endswith(".js"):
+        return Response("/* fallback script */", mimetype="application/javascript")
+    elif any(path.endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".svg", ".webp", ".gif", ".ico"]):
+        # Attempt fallback to SVG / image
+        data, content_type = storage.find_resource(site, date, ".svg")
+        if data is not None:
+            return Response(data, mimetype=content_type)
+        return Response('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>', mimetype="image/svg+xml")
+
+    abort(404, description=f"Asset not found: {path}")
 
 
 # ---------------------------------------------------------------------------
@@ -120,3 +188,4 @@ def not_found(e):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
+

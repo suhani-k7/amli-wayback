@@ -9,6 +9,15 @@ ARCHIVE_DIR = BASE_DIR / "archive"
 TRACKED_SITES_FILE = BASE_DIR / "tracked_sites.json"
 
 
+def is_504_error(html_str: str) -> bool:
+    if not html_str:
+        return True
+    lower = html_str.lower()
+    if "504 error" in lower or "cloudfront attempted to establish" in lower or "service temporarily unavailable" in lower:
+        return True
+    return False
+
+
 class LocalStorage:
     def __init__(self):
         ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
@@ -67,17 +76,33 @@ class LocalStorage:
             return None
 
     def get_index_html(self, index_html_id_or_site=None, date=None):
-        """Read index.html from disk for snapshot, with fallback to page.html."""
+        """Read index.html from disk for snapshot, with fallback to page.html and fallback to nearest valid snapshot."""
         if date is not None and index_html_id_or_site is not None:
             snap_dir = self._get_snapshot_dir(index_html_id_or_site, date)
-            # Try index.html first, then fall back to page.html (old capture format)
+            # 1. Try index.html first, then page.html for requested date
             for candidate in ["index.html", "page.html"]:
                 f = snap_dir / candidate
                 if f.exists():
-                    return f.read_text(encoding="utf-8")
+                    txt = f.read_text(encoding="utf-8", errors="ignore")
+                    if not is_504_error(txt):
+                        return txt
+
+            # 2. Fallback to nearest valid snapshot date for this site if requested date has 504 error
+            site_dir = ARCHIVE_DIR / index_html_id_or_site
+            if site_dir.exists():
+                for d in sorted(site_dir.iterdir(), reverse=True):
+                    if d.is_dir() and d.name != date:
+                        for candidate in ["index.html", "page.html"]:
+                            f = d / candidate
+                            if f.exists():
+                                txt = f.read_text(encoding="utf-8", errors="ignore")
+                                if not is_504_error(txt):
+                                    return txt
             return None
         elif index_html_id_or_site and os.path.exists(index_html_id_or_site):
-            return Path(index_html_id_or_site).read_text(encoding="utf-8")
+            txt = Path(index_html_id_or_site).read_text(encoding="utf-8", errors="ignore")
+            if not is_504_error(txt):
+                return txt
         return None
 
     def get_resource(self, site: str, date: str, rel_path: str):
@@ -94,6 +119,73 @@ class LocalStorage:
             else:
                 content_type = "application/octet-stream"
         return file_path.read_bytes(), content_type
+
+    def get_screenshot(self, site: str, date: str):
+        """Read screenshot.png for a snapshot if present."""
+        snap_dir = self._get_snapshot_dir(site, date)
+        screenshot_file = snap_dir / "screenshot.png"
+        if screenshot_file.exists():
+            return screenshot_file.read_bytes()
+        return None
+
+    def find_resource(self, site: str, date: str, path_or_filename: str):
+        """Find a resource by exact relative path, filename, stem prefix, cross-date search, or cross-site search."""
+        clean_path = path_or_filename.lstrip("/")
+        fname = Path(clean_path).name
+        stem = Path(fname).stem
+        ext = Path(fname).suffix
+
+        # Order of snapshot directories to search:
+        # 1. Target date snapshot dir
+        # 2. Other snapshot dates of the same site (e.g. July 27, 21, 20, 19, 18, 17)
+        # 3. Snapshot dirs of all other sites in archive
+        dirs_to_search = []
+        site_dir = ARCHIVE_DIR / site
+        if site_dir.exists():
+            target_snap = site_dir / date
+            if target_snap.exists():
+                dirs_to_search.append(target_snap)
+            for d in sorted(site_dir.iterdir(), reverse=True):
+                if d.is_dir() and d != target_snap:
+                    dirs_to_search.append(d)
+
+        if ARCHIVE_DIR.exists():
+            for other_site in ARCHIVE_DIR.iterdir():
+                if other_site.is_dir() and other_site != site_dir:
+                    for d in sorted(other_site.iterdir(), reverse=True):
+                        if d.is_dir():
+                            dirs_to_search.append(d)
+
+        # Phase 1: Search for exact filename match or direct path match
+        for snap_d in dirs_to_search:
+            res_dir = snap_d / "resources"
+            if not res_dir.exists():
+                continue
+
+            candidate = res_dir / clean_path
+            if candidate.exists() and candidate.is_file():
+                content_type, _ = mimetypes.guess_type(candidate)
+                return candidate.read_bytes(), content_type or "application/octet-stream"
+
+            if fname:
+                for f in res_dir.rglob("*"):
+                    if f.is_file() and f.name == fname:
+                        content_type, _ = mimetypes.guess_type(f)
+                        return f.read_bytes(), content_type or "application/octet-stream"
+
+        # Phase 2: Search for stem match (handles hashed filenames like 3dd13b90f2875e86_635edbf937c23a98.css)
+        if fname and len(stem) >= 3:
+            for snap_d in dirs_to_search:
+                res_dir = snap_d / "resources"
+                if not res_dir.exists():
+                    continue
+                for f in res_dir.rglob("*"):
+                    if f.is_file() and f.name.startswith(stem):
+                        if not ext or f.name.endswith(ext):
+                            content_type, _ = mimetypes.guess_type(f)
+                            return f.read_bytes(), content_type or "application/octet-stream"
+
+        return None, None
 
     @staticmethod
     def _has_html(date_dir: Path) -> bool:
@@ -119,11 +211,19 @@ class LocalStorage:
                 date_str = date_dir.name
                 meta = self.get_snapshot(site_name, date_str)
                 url = meta.get("url", site_name) if meta else site_name
+                res_dir = date_dir / "resources"
+                res_count = len(list(res_dir.rglob("*"))) if res_dir.exists() else 0
+                has_screenshot = (date_dir / "screenshot.png").exists()
+                has_index_html = (date_dir / "index.html").exists()
                 snaps.append({
                     "site": site_name,
                     "date": date_str,
                     "url": url,
-                    "capturedAt": meta.get("capturedAt") if meta else ""
+                    "capturedAt": meta.get("capturedAt") if meta else "",
+                    "hasResources": res_count > 5,  # full capture has dozens/hundreds of resources
+                    "resourceCount": res_count,
+                    "hasScreenshot": has_screenshot,
+                    "hasIndexHtml": has_index_html,
                 })
             if snaps:
                 grouped[site_name] = snaps
