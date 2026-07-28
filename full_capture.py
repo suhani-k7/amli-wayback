@@ -31,22 +31,38 @@ from pathlib import Path
 from datetime import datetime, timezone
 from urllib.parse import urlparse, urljoin
 from playwright.sync_api import sync_playwright
-from storage import MongoStorage
+from storage import LocalStorage
 
 BASE_DIR = Path(__file__).parent
 SITES_FILE = BASE_DIR / "sites.txt"
 FULL_ARCHIVE_DIR = BASE_DIR / "full-archive"
 TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-storage = MongoStorage()
+storage = LocalStorage()
 
 
 
 def load_urls():
-    if not SITES_FILE.exists():
-        print(f"Error: {SITES_FILE} not found.")
-        return []
-    with open(SITES_FILE, "r", encoding="utf-8") as f:
-        return [line.strip() for line in f if line.strip()]
+    """Load URLs from sites.txt and merge with any URLs in tracked_sites.json."""
+    urls = []
+    if SITES_FILE.exists():
+        with open(SITES_FILE, "r", encoding="utf-8") as f:
+            urls = [line.strip() for line in f if line.strip()]
+    else:
+        print(f"Warning: {SITES_FILE} not found — loading from tracked_sites.json only.")
+
+    try:
+        tracked = storage.list_tracked_urls()
+        added = 0
+        for u in tracked:
+            if u not in urls:
+                urls.append(u)
+                added += 1
+        if added:
+            print(f"  + Merged {added} URL(s) from tracked_sites.json.")
+    except Exception as e:
+        print(f"Warning: Could not load tracked_sites: {e}")
+
+    return urls
 
 
 def url_to_folder_name(url: str) -> str:
@@ -332,7 +348,7 @@ def capture_url(page, url: str):
 
         
         # Save index.html
-        # Save every captured resource (now rewritten where applicable) to MongoDB
+        # Save every captured resource (now rewritten where applicable) to local disk
         for orig_res_url, details in captured_resources.items():
             storage.save_resource(
                 site=sanitized_domain,
@@ -344,7 +360,7 @@ def capture_url(page, url: str):
                 category=details["category"],
             )
 
-        # Save the rewritten index.html to MongoDB
+        # Save the rewritten index.html to local disk
         index_html_id = storage.save_index_html(sanitized_domain, TODAY, rewritten_html)
 
         # Save resource map + status info as the snapshot's metadata document

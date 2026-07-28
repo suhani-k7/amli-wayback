@@ -1,14 +1,17 @@
-name: Full Resource Capture (MongoDB)
+name: Full Resource Capture (Local Archive)
 
 on:
   schedule:
     - cron: '30 0 * * *'   # 6:00 AM IST (12:30 AM UTC) daily
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   full-capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -21,6 +24,12 @@ jobs:
       - run: playwright install --with-deps chromium
 
       - name: Run full capture
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: python full_capture.py
+
+      - name: Commit archive
+        run: |
+          git config user.name "archive-bot"
+          git config user.email "archive-bot@users.noreply.github.com"
+          git add archive/ tracked_sites.json
+          git commit -m "Full capture $(date -u +'%Y-%m-%d')" || echo "No changes to commit"
+          git push
