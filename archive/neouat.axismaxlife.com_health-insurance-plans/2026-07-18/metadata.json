@@ -1,0 +1,14 @@
+{
+  "site": "neouat.axismaxlife.com_health-insurance-plans",
+  "url": "https://neouat.axismaxlife.com/health-insurance-plans",
+  "date": "2026-07-18",
+  "capturedAt": "2026-07-18T03:47:30.073Z",
+  "statusCode": 503,
+  "capturedResourcesCount": 2,
+  "failedResourcesCount": 0,
+  "failedResources": {},
+  "resourceMap": {
+    "https://neouat.axismaxlife.com/18f5227b-e27b-445a-a53f-f845fbe69b40/stormcaster.js": "resources/js/stormcaster_acc0dc1313bef3cf.js",
+    "https://neouat.axismaxlife.com/c99a4269-161c-4242-a3f0-28d44fa6ce24?": "resources/other/c99a4269-161c-4242-a3f0-28d44fa6ce24_58c0eda7938d231e.txt"
+  }
+}

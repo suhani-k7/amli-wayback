@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMLI Wayback — Website Archive Viewer</title>
+  <meta name="description" content="Browse and replay archived website snapshots stored in MongoDB. Select a URL, pick a date, and view the fully offline-rendered page." />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🕰</text></svg>" />
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ============================================================
+       TOOLBAR
+       ============================================================ -->
+  <header id="toolbar" role="banner">
+    <a class="logo" href="/" aria-label="AMLI Wayback home">
+      <div class="logo-icon" aria-hidden="true">🕰</div>
+      <div>
+        <span class="logo-text">AMLI Wayback</span>
+        <span class="logo-subtitle">Local Archive Viewer</span>
+      </div>
+    </a>
+
+    <div class="search-wrapper" role="search">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input
+        id="url-input"
+        type="url"
+        placeholder="Search or paste a URL… e.g. https://example.com"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search or enter a URL"
+        aria-autocomplete="list"
+        aria-controls="autocomplete-list"
+      />
+      <div id="autocomplete-list" role="listbox" aria-label="URL suggestions"></div>
+    </div>
+
+    <button id="btn-add" type="button" title="Add this URL to tracked sites">
+      <span aria-hidden="true">＋</span> Add URL
+    </button>
+
+    <button id="theme-toggle" type="button" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle light/dark theme">
+      <span class="sun-icon" aria-hidden="true">☀️</span>
+      <span class="moon-icon" aria-hidden="true">🌙</span>
+    </button>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <main id="main" role="main">
+
+    <!-- ---- SIDEBAR: calendar ---- -->
+    <aside id="sidebar" aria-label="Snapshot calendar">
+      <div class="sidebar-header">
+        <p class="sidebar-title">Snapshots <span class="snap-count-badge" id="snap-count"></span></p>
+        <div class="site-info">
+          <div class="site-dot" id="site-dot" aria-hidden="true"></div>
+          <span class="site-name" id="site-name">Select a URL to browse snapshots</span>
+        </div>
+      </div>
+
+      <div id="calendar-section" aria-label="Snapshot dates">
+        <div class="calendar-empty">
+          <div class="calendar-empty-icon" aria-hidden="true">🗓</div>
+          <div class="calendar-empty-text">
+            Search for a site above or add a new URL to get started.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ---- VIEWER PANE ---- -->
+    <section id="viewer-pane" aria-label="Snapshot viewer">
+
+      <!-- Loading spinner (shown while iframe loads) -->
+      <div class="spinner-overlay" id="spinner-overlay" role="status" aria-label="Loading snapshot">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Topbar (hidden until a snapshot is selected) -->
+      <div class="viewer-topbar" id="viewer-topbar" style="display:none" aria-label="Snapshot info">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Collapse sidebar" title="Collapse calendar sidebar">
+          <span class="toggle-icon-collapse" aria-hidden="true">◀</span>
+          <span class="toggle-icon-expand" aria-hidden="true" style="display:none">▶</span>
+        </button>
+        <div class="viewer-breadcrumb" aria-live="polite">
+          <span>📦</span>
+          <span class="bc-site" id="bc-site"></span>
+          <span>›</span>
+          <span class="bc-date" id="bc-date"></span>
+        </div>
+        <div class="viewer-badges">
+          <span class="badge badge-archived">✓ Archived</span>
+          <span class="badge badge-offline">⚡ Served from Local Archive</span>
+        </div>
+      </div>
+
+      <!-- Placeholder (shown when nothing is selected) -->
+      <div id="viewer-placeholder" aria-label="Viewer placeholder">
+        <div class="placeholder-icon" aria-hidden="true">🗃</div>
+        <h1 class="placeholder-title">Select a snapshot to preview</h1>
+        <p class="placeholder-subtitle">
+          Choose a URL from the toolbar, then click any highlighted date in the
+          calendar to replay an archived version of the page — served live from
+          local disk, with all CSS, images and fonts intact.
+        </p>
+      </div>
+
+      <!-- The snapshot iframe -->
+      <iframe
+        id="snapshot-iframe"
+        style="display:none"
+        title="Archived snapshot viewer"
+        sandbox="allow-same-origin allow-scripts allow-forms"
+        loading="lazy"
+      ></iframe>
+
+    </section>
+  </main>
+
+  <!-- Toast notification -->
+  <div id="toast" role="alert" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

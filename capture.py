@@ -26,6 +26,8 @@ def url_to_folder_name(url: str) -> str:
     # Turn a URL into a safe folder name, e.g. https://blog.yourcompany.com -> blog.yourcompany.com
     name = re.sub(r"^https?://", "", url)
     name = re.sub(r"[/:?&=]+", "_", name)
+    if name.endswith("_"):
+        name = name[:-1]
     return name
 
 
