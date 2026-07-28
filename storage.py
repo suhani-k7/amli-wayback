@@ -23,6 +23,44 @@ class LocalStorage:
         ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
         if not TRACKED_SITES_FILE.exists():
             TRACKED_SITES_FILE.write_text("[]", encoding="utf-8")
+        self.refresh_resource_index()
+
+    def refresh_resource_index(self):
+        """Build instant O(1) in-memory lookup maps for all archived resource files."""
+        self._index_exact = {}       # filename -> Path
+        self._index_stem = {}        # stem_prefix -> Path
+        self._site_date_map = {}     # (site, date, rel_path) -> Path
+        self._all_css = {}           # site -> list of Path
+
+        if not ARCHIVE_DIR.exists():
+            return
+
+        for f in ARCHIVE_DIR.glob("*/*/resources/**/*"):
+            if f.is_file():
+                rel_parts = f.relative_to(ARCHIVE_DIR).parts
+                if len(rel_parts) >= 4:
+                    s_name = rel_parts[0]
+                    d_name = rel_parts[1]
+                    # rel_p is path inside resources/ e.g. css/3dd13b90f2875e86_...css
+                    rel_p = "/".join(rel_parts[3:])
+                    self._site_date_map[(s_name, d_name, rel_p)] = f
+                    
+                    if f.suffix == ".css":
+                        if s_name not in self._all_css:
+                            self._all_css[s_name] = []
+                        self._all_css[s_name].append(f)
+
+                fname = f.name
+                if fname not in self._index_exact:
+                    self._index_exact[fname] = f
+
+                stem = f.stem
+                if "_" in stem:
+                    prefix = stem.split("_")[0]
+                    if len(prefix) >= 3 and prefix not in self._index_stem:
+                        self._index_stem[prefix] = f
+                elif len(stem) >= 3 and stem not in self._index_stem:
+                    self._index_stem[stem] = f
 
     def _get_snapshot_dir(self, site: str, date: str) -> Path:
         return ARCHIVE_DIR / site / date
@@ -32,6 +70,13 @@ class LocalStorage:
         file_path = self._get_snapshot_dir(site, date) / rel_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_bytes(data)
+        # Update index dynamically
+        fname = file_path.name
+        self._index_exact[fname] = file_path
+        if "_" in file_path.stem:
+            pfx = file_path.stem.split("_")[0]
+            if len(pfx) >= 3:
+                self._index_stem[pfx] = file_path
         return rel_path
 
     def save_index_html(self, site: str, date: str, html: str):
@@ -129,61 +174,35 @@ class LocalStorage:
         return None
 
     def find_resource(self, site: str, date: str, path_or_filename: str):
-        """Find a resource by exact relative path, filename, stem prefix, cross-date search, or cross-site search."""
+        """O(1) instant in-memory resource lookup."""
         clean_path = path_or_filename.lstrip("/")
         fname = Path(clean_path).name
         stem = Path(fname).stem
-        ext = Path(fname).suffix
 
-        # Order of snapshot directories to search:
-        # 1. Target date snapshot dir
-        # 2. Other snapshot dates of the same site (e.g. July 27, 21, 20, 19, 18, 17)
-        # 3. Snapshot dirs of all other sites in archive
-        dirs_to_search = []
-        site_dir = ARCHIVE_DIR / site
-        if site_dir.exists():
-            target_snap = site_dir / date
-            if target_snap.exists():
-                dirs_to_search.append(target_snap)
-            for d in sorted(site_dir.iterdir(), reverse=True):
-                if d.is_dir() and d != target_snap:
-                    dirs_to_search.append(d)
+        # 1. Direct site+date+path lookup
+        if site and date and (site, date, clean_path) in self._site_date_map:
+            target_f = self._site_date_map[(site, date, clean_path)]
+            content_type, _ = mimetypes.guess_type(target_f)
+            return target_f.read_bytes(), content_type or "application/octet-stream"
 
-        if ARCHIVE_DIR.exists():
-            for other_site in ARCHIVE_DIR.iterdir():
-                if other_site.is_dir() and other_site != site_dir:
-                    for d in sorted(other_site.iterdir(), reverse=True):
-                        if d.is_dir():
-                            dirs_to_search.append(d)
+        # 2. Exact filename match lookup
+        if fname and fname in self._index_exact:
+            target_f = self._index_exact[fname]
+            content_type, _ = mimetypes.guess_type(target_f)
+            return target_f.read_bytes(), content_type or "application/octet-stream"
 
-        # Phase 1: Search for exact filename match or direct path match
-        for snap_d in dirs_to_search:
-            res_dir = snap_d / "resources"
-            if not res_dir.exists():
-                continue
+        # 3. Stem prefix match lookup
+        if stem and stem in self._index_stem:
+            target_f = self._index_stem[stem]
+            content_type, _ = mimetypes.guess_type(target_f)
+            return target_f.read_bytes(), content_type or "application/octet-stream"
 
-            candidate = res_dir / clean_path
-            if candidate.exists() and candidate.is_file():
-                content_type, _ = mimetypes.guess_type(candidate)
-                return candidate.read_bytes(), content_type or "application/octet-stream"
-
-            if fname:
-                for f in res_dir.rglob("*"):
-                    if f.is_file() and f.name == fname:
-                        content_type, _ = mimetypes.guess_type(f)
-                        return f.read_bytes(), content_type or "application/octet-stream"
-
-        # Phase 2: Search for stem match (handles hashed filenames like 3dd13b90f2875e86_635edbf937c23a98.css)
-        if fname and len(stem) >= 3:
-            for snap_d in dirs_to_search:
-                res_dir = snap_d / "resources"
-                if not res_dir.exists():
-                    continue
-                for f in res_dir.rglob("*"):
-                    if f.is_file() and f.name.startswith(stem):
-                        if not ext or f.name.endswith(ext):
-                            content_type, _ = mimetypes.guess_type(f)
-                            return f.read_bytes(), content_type or "application/octet-stream"
+        # 4. Fallback CSS match for site
+        if clean_path.endswith(".css") or clean_path == ".css":
+            css_list = self._all_css.get(site) or (list(self._all_css.values())[0] if self._all_css else [])
+            if css_list:
+                target_f = css_list[0]
+                return target_f.read_bytes(), "text/css"
 
         return None, None
 
