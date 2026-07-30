@@ -1,0 +1,12 @@
+{
+  "site": "example-test.com",
+  "url": "https://example-test.com",
+  "date": "2026-07-30",
+  "capturedAt": "2026-07-30T03:43:58.663493+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 0,
+  "failedResourcesCount": 0,
+  "failedResources": {},
+  "resourceMap": {},
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/example-test.com/2026-07-30/index.html"
+}
