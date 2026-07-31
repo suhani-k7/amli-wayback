@@ -100,9 +100,10 @@
           <span>›</span>
           <span class="bc-date" id="bc-date"></span>
         </div>
+
         <div class="viewer-badges">
-          <span class="badge badge-archived">✓ Archived</span>
-          <span class="badge badge-offline">⚡ Served from Local Archive</span>
+          <span class="badge badge-archived" id="badge-status">✓ Archived</span>
+          <span class="badge badge-offline" id="badge-type">⚡ Served from Local Archive</span>
         </div>
       </div>
 
@@ -117,6 +118,16 @@
         </p>
       </div>
 
+      <!-- Screenshot fallback warning (shown when a snapshot is displayed as a screenshot) -->
+      <div id="screenshot-warning" class="screenshot-warning" style="display:none" role="note">
+        <span class="screenshot-warning-icon" aria-hidden="true">📷</span>
+        <span class="screenshot-warning-text">
+          <strong>This snapshot is displayed as a full-page screenshot.</strong>
+          The archived page resources for this date are incomplete, so the website could not
+          be re-rendered accurately. Showing the captured screenshot instead.
+        </span>
+      </div>
+
       <!-- The snapshot iframe -->
       <iframe
         id="snapshot-iframe"
@@ -124,7 +135,12 @@
         title="Archived snapshot viewer"
         sandbox="allow-same-origin allow-scripts allow-forms"
         loading="lazy"
-      ></iframe>
+      >      </iframe>
+
+      <!-- Screenshot fallback view -->
+      <div id="screenshot-container" style="display:none">
+        <img id="snapshot-img" alt="Full-page screenshot of the archived snapshot" />
+      </div>
 
     </section>
   </main>

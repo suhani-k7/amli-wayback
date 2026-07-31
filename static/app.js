@@ -11,6 +11,7 @@
   let allSites = [];          // [{url, site}, …]
   let currentSite = null;     // {url, site}
   let currentDates = [];      // ['2025-07-04', …]
+  let currentModes = {};      // {date: 'html' | 'screenshot', …}
   let selectedDate = null;
   let acIndex = -1;           // keyboard nav index in autocomplete
   let acOpen = false;
@@ -33,6 +34,10 @@
   const bcDate          = document.getElementById('bc-date');
   const themeToggle     = document.getElementById('theme-toggle');
   const sidebarToggle   = document.getElementById('sidebar-toggle');
+  const screenshotWarning = document.getElementById('screenshot-warning');
+  const screenshotContainer = document.getElementById('screenshot-container');
+  const snapshotImg     = document.getElementById('snapshot-img');
+  const badgeType       = document.getElementById('badge-type');
 
   // ----------------------------------------------------------------
   // Bootstrap
@@ -53,10 +58,10 @@
     }
   }
 
-  async function fetchDates(site) {
+  async function fetchSnapshotData(site) {
     const res = await fetch(`/api/snapshots/${encodeURIComponent(site)}`);
     const data = await res.json();
-    return data.dates || [];
+    return { dates: data.dates || [], modes: data.modes || {} };
   }
 
   async function postSite(url) {
@@ -170,7 +175,9 @@
     siteDotEl.style.display = 'block';
 
     showCalendarLoading();
-    currentDates = await fetchDates(siteObj.site);
+    const data = await fetchSnapshotData(siteObj.site);
+    currentDates = data.dates;
+    currentModes = data.modes;
     renderCalendar(currentDates);
   }
 
@@ -301,29 +308,57 @@
   // Snapshot viewer
   // ----------------------------------------------------------------
   function openSnapshot(site, date) {
-    // Update selected state
     selectedDate = date;
     calSection.querySelectorAll('.cal-day').forEach(el => {
       el.classList.toggle('selected', el.dataset.date === date);
     });
 
+    // Collapse the calendar sidebar by default so the viewer gets full width
+    setSidebarCollapsed(true);
+
     // Show topbar, hide placeholder
     viewerPlaceholder.style.display = 'none';
     viewerTopbar.style.display = 'flex';
-    snapshotIframe.style.display = 'block';
 
     // Update breadcrumb
     bcSite.textContent = site;
     bcDate.textContent = date;
 
-    // Show spinner while loading
+    if (currentModes[date] === 'screenshot') {
+      showScreenshotView(site, date);
+    } else {
+      showHtmlView(site, date);
+    }
+  }
+
+  // Re-render the archived website in an iframe
+  function showHtmlView(site, date) {
+    if (screenshotWarning) screenshotWarning.style.display = 'none';
+    screenshotContainer.style.display = 'none';
+    snapshotIframe.style.display = 'block';
+    if (badgeType) badgeType.textContent = '⚡ Served from Local Archive';
+
     spinnerOverlay.classList.add('active');
     snapshotIframe.onload = () => spinnerOverlay.classList.remove('active');
+    snapshotIframe.src = `/view/${encodeURIComponent(site)}/${encodeURIComponent(date)}/`;
+  }
 
-    const url = `/view/${encodeURIComponent(site)}/${encodeURIComponent(date)}/`;
-    snapshotIframe.src = url;
+  // Show the full-page screenshot instead, with a warning note
+  function showScreenshotView(site, date) {
+    snapshotIframe.style.display = 'none';
+    if (screenshotWarning) screenshotWarning.style.display = 'flex';
+    screenshotContainer.style.display = 'flex';
+    if (badgeType) badgeType.textContent = '📷 Screenshot — resources incomplete';
 
-    showToast(`Loading snapshot: ${date}`, 'info');
+    spinnerOverlay.classList.add('active');
+    snapshotImg.onload = () => spinnerOverlay.classList.remove('active');
+    snapshotImg.onerror = () => {
+      spinnerOverlay.classList.remove('active');
+      screenshotContainer.style.display = 'none';
+      if (screenshotWarning) screenshotWarning.style.display = 'none';
+      showToast('No screenshot available for this date', 'error');
+    };
+    snapshotImg.src = `/view/${encodeURIComponent(site)}/${encodeURIComponent(date)}/screenshot`;
   }
 
   // ----------------------------------------------------------------

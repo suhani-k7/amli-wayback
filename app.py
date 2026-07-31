@@ -20,6 +20,10 @@ from storage import LocalStorage
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 storage = LocalStorage()
 
+# Sites that render acceptably from the raw page.html alone; never force the
+# screenshot fallback for them even on days where the full capture is missing.
+SCREENSHOT_FALLBACK_EXCLUDE = {"neouat.axismaxlife.com_health-insurance-plans"}
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -78,9 +82,17 @@ def api_add_site():
 
 @app.route("/api/snapshots/<site>")
 def api_get_snapshots(site):
-    """Return a list of dates that have a stored snapshot for the given site slug."""
+    """Return a list of dates that have a stored snapshot for the given site slug,
+    plus a per-date render mode ('html' or 'screenshot') for the frontend."""
     dates = storage.get_snapshot_dates(site)
-    return jsonify({"site": site, "dates": dates})
+    modes = {
+        d: "screenshot"
+        if storage.get_snapshot_mode(site, d) == "screenshot"
+        and site not in SCREENSHOT_FALLBACK_EXCLUDE
+        else "html"
+        for d in dates
+    }
+    return jsonify({"site": site, "dates": dates, "modes": modes})
 
 
 # ---------------------------------------------------------------------------
