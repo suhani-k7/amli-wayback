@@ -1,0 +1,41 @@
+{
+  "site": "neouat.axismaxlife.com_health-insurance-plans",
+  "url": "https://neouat.axismaxlife.com/health-insurance-plans",
+  "date": "2026-08-02",
+  "capturedAt": "2026-08-02T04:05:26.384933+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 26,
+  "failedResourcesCount": 1,
+  "failedResources": {
+    "https://neouat.axismaxlife.com/corp-astro-static/_astro/trackApplication.CFmioWjL.js": "HTTP 503"
+  },
+  "resourceMap": {
+    "https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Sans:wght@400;700&display=swap": "resources/css/css2_61d77a0a5343266a.css",
+    "https://fonts.gstatic.com/s/notosans/v42/o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a7du3mhPy0.woff2": "resources/fonts/o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a7du3mhPy0_99b467158070d3b3.woff2",
+    "https://neouat.axismaxlife.com/18f5227b-e27b-445a-a53f-f845fbe69b40/stormcaster.js": "resources/js/stormcaster_acc0dc1313bef3cf.js",
+    "https://neouat.axismaxlife.com/corp-astro-static/_astro/MobileNavigation.astro_astro_type_script_index_0_lang.Bn_0-6w5.js": "resources/js/MobileNavigation_astro_astro_type_script_index_0_lang_Bn_0-6w5_4d4974327371860e.js",
+    "https://www.axismaxlife.com/static-page/assets/Term-plan2.svg": "resources/img/Term-plan2_aba635965232f139.svg",
+    "https://neouat.axismaxlife.com/corp-astro-static/_astro/HomeHeaderNew.astro_astro_type_script_index_0_lang.yTmcdpqj.js": "resources/js/HomeHeaderNew_astro_astro_type_script_index_0_lang_yTmcdpqj_6999f1b97c00f951.js",
+    "https://www.axismaxlife.com/static-page/assets/money-insurance%202.svg": "resources/img/money-insurance_202_cf23573868b3f854.svg",
+    "https://neouat.axismaxlife.com/c99a4269-161c-4242-a3f0-28d44fa6ce24?": "resources/other/c99a4269-161c-4242-a3f0-28d44fa6ce24_58c0eda7938d231e.txt",
+    "https://www.axismaxlife.com/static-page/assets/travel-insurance-1.svg": "resources/img/travel-insurance-1_3ef56382c2fd9b09.svg",
+    "https://www.axismaxlife.com/static-page/assets/Term-plan-3.svg": "resources/img/Term-plan-3_0119f67c9f76218e.svg",
+    "https://www.axismaxlife.com/static-page/assets/personal-security%201.svg": "resources/img/personal-security_201_1f03b715d3aad634.svg",
+    "https://www.axismaxlife.com/static-page/assets/homepage/axis-max-life-insurance-logo.svg": "resources/img/axis-max-life-insurance-logo_d0382ad0dacb4cca.svg",
+    "https://www.axismaxlife.com/static-page/assets/Term-plan-1.svg": "resources/img/Term-plan-1_7b7713b9477d316a.svg",
+    "https://www.axismaxlife.com/static-page/assets/term-plan-4.svg": "resources/img/term-plan-4_46dae588f985732f.svg",
+    "https://www.axismaxlife.com/static-page/assets/healthcare-1.svg": "resources/img/healthcare-1_9fae0c8e53cee8be.svg",
+    "https://www.axismaxlife.com/static-page/assets/money-insurance%202.png": "resources/img/money-insurance_202_7259cecab02fa00a.png",
+    "https://www.axismaxlife.com/static-page/assets/investment-plans-2.svg": "resources/img/investment-plans-2_9b64d74f35c87034.svg",
+    "https://www.axismaxlife.com/static-page/assets/investment-plans-1.svg": "resources/img/investment-plans-1_1cbb7ec4b67fdf20.svg",
+    "https://www.axismaxlife.com/static-page/assets/investment-plans-3.svg": "resources/img/investment-plans-3_0e544a83d70869a8.svg",
+    "https://www.axismaxlife.com/static-page/assets/term-plan-5.svg": "resources/img/term-plan-5_b344a15e980934a9.svg",
+    "https://www.axismaxlife.com/static-page/assets/investment-plans.svg": "resources/img/investment-plans_33658dd54a19f57e.svg",
+    "https://www.axismaxlife.com/static-page/assets/health-insurance-2.svg": "resources/img/health-insurance-2_ad71dff23d864848.svg",
+    "https://www.axismaxlife.com/static-page/assets/investment-plans-5.svg": "resources/img/investment-plans-5_589031697820e344.svg",
+    "https://www.axismaxlife.com/static-page/assets/Vector-3.svg": "resources/img/Vector-3_6a71138968bb5921.svg",
+    "https://www.axismaxlife.com/static-page/assets/Vector-5.svg": "resources/img/Vector-5_ac23ed82534d3bab.svg",
+    "https://www.axismaxlife.com/static-page/assets/Vector-2.svg": "resources/img/Vector-2_a4028fdb48e6cd2d.svg"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/neouat.axismaxlife.com_health-insurance-plans/2026-08-02/index.html"
+}
