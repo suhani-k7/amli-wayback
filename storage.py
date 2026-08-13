@@ -341,6 +341,14 @@ class LocalStorage:
         dates = [d.name for d in site_dir.iterdir() if d.is_dir() and self._has_html(d)]
         return sorted(dates)
 
+    def get_closest_snapshot_date(self, site: str, target_date: str) -> str | None:
+        """Return the snapshot date nearest to target_date (YYYY-MM-DD), or None if none exist."""
+        dates = self.get_snapshot_dates(site)
+        if not dates:
+            return None
+        target_dt = datetime.strptime(target_date, "%Y-%m-%d")
+        return min(dates, key=lambda d: abs((datetime.strptime(d, "%Y-%m-%d") - target_dt).days))
+
     def get_snapshot_mode(self, site: str, date: str) -> str:
         """Return 'screenshot' when the snapshot has no full index.html capture (page.html-only,
         meaning the full resource capture did not run that day), else 'html'."""
@@ -350,7 +358,6 @@ class LocalStorage:
         if (snap_dir / "page.html").exists():
             return "screenshot"
         return "html"
-
     def _read_tracked_sites(self) -> list[dict]:
         if not TRACKED_SITES_FILE.exists():
             return []

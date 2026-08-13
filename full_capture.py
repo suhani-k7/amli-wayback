@@ -7,7 +7,7 @@ images, and fonts to a local directory hierarchy, and rewrites the DOM and CSS f
 to link to local copies.
 
 ================================================================================
-KNOWN ARCHIVING LIMITATIONS (As required by Requirement 10):
+KNOWN ARCHIVING LIMITATIONS
 1. CLIENT-SIDE API CALLS: Any content or data fetched dynamically via client-side JavaScript
    (e.g., fetch, XMLHttpRequest) after the initial page load or during dynamic user interactions
    (like modern Single Page Applications (SPAs) built with React, Vue, or Angular fetching
