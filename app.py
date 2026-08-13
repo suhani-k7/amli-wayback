@@ -13,7 +13,7 @@ GET  /view/<site>/<date>/resources/<cat>/<fn>  → Stream a resource
 
 import re
 import os
-from flask import Flask, Response, abort, jsonify, request, send_from_directory
+from flask import Flask, Response, abort, jsonify, redirect, request, send_from_directory
 
 from storage import LocalStorage
 
@@ -45,6 +45,14 @@ def url_to_site_slug(url: str) -> str:
 @app.route("/")
 def index():
     return send_from_directory("static", "index.html")
+
+
+# React frontend build (frontend/ → static/react). Flask's static route cannot
+# resolve a directory path, so expose a stable entry URL for the built app.
+@app.route("/static/react")
+@app.route("/static/react/")
+def react_index():
+    return redirect("/static/react/index.html")
 
 
 # ---------------------------------------------------------------------------
