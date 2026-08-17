@@ -1,0 +1,31 @@
+{
+  "site": "neouat.axismaxlife.com_investment-plans",
+  "url": "https://neouat.axismaxlife.com/investment-plans",
+  "date": "2026-08-17",
+  "capturedAt": "2026-08-17T02:06:19.284804+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 15,
+  "failedResourcesCount": 2,
+  "failedResources": {
+    "https://neouat.axismaxlife.com/c99a4269-161c-4242-a3f0-28d44fa6ce24?": "Body read error: Response.body: Protocol error (Network.getResponseBody): No resource with given identifier found",
+    "https://b60c2b47c270.w.hcaptcha.com/logo.png": "Body read error: Response.body: Protocol error (Network.getResponseBody): No data found for resource with given identifier"
+  },
+  "resourceMap": {
+    "https://fonts.googleapis.com/css?family=Roboto": "resources/css/css_ece6acc3bf713f32.css",
+    "https://fonts.googleapis.com/css?family=Inter": "resources/css/css_2470dd10fb94e88d.css",
+    "https://fonts.gstatic.com/s/roboto/v51/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAr0klQmz24.woff2": "resources/fonts/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAr0klQmz24_47d952b623b612a0.woff2",
+    "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2": "resources/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA_29ede7bd4be32ab0.woff2",
+    "https://neouat.axismaxlife.com/18f5227b-e27b-445a-a53f-f845fbe69b40/stormcaster.js": "resources/js/stormcaster_acc0dc1313bef3cf.js",
+    "https://captcha.perfdrive.com/captcha-public/css/shieldsquare_styles.min.css": "resources/css/shieldsquare_styles_min_40679d81edb55561.css",
+    "https://hcaptcha.com/1/api.js?recaptchacompat=off": "resources/js/api_448ba43c95f9fbc8.js",
+    "https://captcha.perfdrive.com/captcha-public/images/ss_captcha.png": "resources/img/ss_captcha_ff885f53fd6b05af.png",
+    "https://fonts.googleapis.com/css?family=Lato": "resources/css/css_8518689457ec3e7b.css",
+    "https://cdn.perfdrive.com/aperture/aperture.js": "resources/js/aperture_662c39a8d80ad36a.js",
+    "https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXiWtFCc.woff2": "resources/fonts/S6uyw4BMUTPHjx4wXiWtFCc_23f7c01d806c2855.woff2",
+    "https://cas.avalon.perfdrive.com/jsdata?": "resources/other/jsdata_6a42e95368151108.txt",
+    "https://ba701f77c6ab.w.hcaptcha.com/logo.png": "resources/img/logo_a38d9ed14df2255c.png",
+    "https://api.hcaptcha.com/checksiteconfig?v=1dab630d2576352c6ab33820f3c19d7400cd0955&host=validate.perfdrive.com&sitekey=ae73173b-7003-44e0-bc87-654d0dab8b75&sc=1&swa=1&spst=1": "resources/other/checksiteconfig_e489218cd2ad1a6d.json",
+    "https://newassets.hcaptcha.com/c/b562abb9fb7828b9190ec5f3d7852578a5b6471347c635b2ceed95a3f28a0f46/hsw.js": "resources/js/hsw_945ab2d460f67e34.js"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/neouat.axismaxlife.com_investment-plans/2026-08-17/index.html"
+}
