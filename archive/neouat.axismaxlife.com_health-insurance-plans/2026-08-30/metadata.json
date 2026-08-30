@@ -1,0 +1,25 @@
+{
+  "site": "neouat.axismaxlife.com_health-insurance-plans",
+  "url": "https://neouat.axismaxlife.com/health-insurance-plans",
+  "date": "2026-08-30",
+  "capturedAt": "2026-08-30T05:42:17.755582+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 10,
+  "failedResourcesCount": 1,
+  "failedResources": {
+    "https://db82c8078b48.w.hcaptcha.com/logo.png": "Body read error: Response.body: Protocol error (Network.getResponseBody): No data found for resource with given identifier"
+  },
+  "resourceMap": {
+    "https://captcha.perfdrive.com/captcha-public/css/shieldsquare_styles.min.css": "resources/css/shieldsquare_styles_min_40679d81edb55561.css",
+    "https://captcha.perfdrive.com/captcha-public/images/ss_captcha.png": "resources/img/ss_captcha_ff885f53fd6b05af.png",
+    "https://hcaptcha.com/1/api.js?recaptchacompat=off": "resources/js/api_448ba43c95f9fbc8.js",
+    "https://fonts.googleapis.com/css?family=Lato": "resources/css/css_8518689457ec3e7b.css",
+    "https://cdn.perfdrive.com/aperture/aperture.js": "resources/js/aperture_662c39a8d80ad36a.js",
+    "https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXiWtFCc.woff2": "resources/fonts/S6uyw4BMUTPHjx4wXiWtFCc_23f7c01d806c2855.woff2",
+    "https://cas.avalon.perfdrive.com/jsdata?": "resources/other/jsdata_6a42e95368151108.txt",
+    "https://3313182bd52d.w.hcaptcha.com/logo.png": "resources/img/logo_af31aa996c6979b8.png",
+    "https://api.hcaptcha.com/checksiteconfig?v=ce9396fa32f5ab87b0a82b60e5313af4da3a3e5b&host=validate.perfdrive.com&sitekey=ae73173b-7003-44e0-bc87-654d0dab8b75&sc=1&swa=1&spst=1": "resources/other/checksiteconfig_8427eb22c95523eb.json",
+    "https://newassets.hcaptcha.com/c/d9b70e9102e05c6a3d5aede9813cd6e1e229730bef8c48ee6893110d2b7cf70f/hsw.js": "resources/js/hsw_7f19a0f970088d0e.js"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/neouat.axismaxlife.com_health-insurance-plans/2026-08-30/index.html"
+}
