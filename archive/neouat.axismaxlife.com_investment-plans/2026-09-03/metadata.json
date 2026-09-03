@@ -1,0 +1,25 @@
+{
+  "site": "neouat.axismaxlife.com_investment-plans",
+  "url": "https://neouat.axismaxlife.com/investment-plans",
+  "date": "2026-09-03",
+  "capturedAt": "2026-09-03T04:54:46.873151+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 10,
+  "failedResourcesCount": 1,
+  "failedResources": {
+    "https://be8482fc5823.w.hcaptcha.com/logo.png": "Body read error: Response.body: Protocol error (Network.getResponseBody): No data found for resource with given identifier"
+  },
+  "resourceMap": {
+    "https://captcha.perfdrive.com/captcha-public/css/shieldsquare_styles.min.css": "resources/css/shieldsquare_styles_min_40679d81edb55561.css",
+    "https://hcaptcha.com/1/api.js?recaptchacompat=off": "resources/js/api_448ba43c95f9fbc8.js",
+    "https://captcha.perfdrive.com/captcha-public/images/ss_captcha.png": "resources/img/ss_captcha_ff885f53fd6b05af.png",
+    "https://fonts.googleapis.com/css?family=Lato": "resources/css/css_8518689457ec3e7b.css",
+    "https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXiWtFCc.woff2": "resources/fonts/S6uyw4BMUTPHjx4wXiWtFCc_23f7c01d806c2855.woff2",
+    "https://cdn.perfdrive.com/aperture/aperture.js": "resources/js/aperture_662c39a8d80ad36a.js",
+    "https://cas.avalon.perfdrive.com/jsdata?": "resources/other/jsdata_6a42e95368151108.txt",
+    "https://api.hcaptcha.com/checksiteconfig?v=3115eb7fbcf7e72ba1ba0f0894c95450cb2c797e&host=validate.perfdrive.com&sitekey=ae73173b-7003-44e0-bc87-654d0dab8b75&sc=1&swa=1&spst=1": "resources/other/checksiteconfig_ae1bbe919ce9a043.json",
+    "https://f06daa5180db.w.hcaptcha.com/logo.png": "resources/img/logo_1d403d979c35d2c4.png",
+    "https://newassets.hcaptcha.com/c/e25a968b98a5ae2dbf18ec8158a1060c9939b8a5968a97afae59942ca73744b9/hsw.js": "resources/js/hsw_369fa34cb06d53ac.js"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/neouat.axismaxlife.com_investment-plans/2026-09-03/index.html"
+}
