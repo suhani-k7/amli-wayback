@@ -1,0 +1,31 @@
+{
+  "site": "neouat.axismaxlife.com_term-insurance-plans",
+  "url": "https://neouat.axismaxlife.com/term-insurance-plans",
+  "date": "2026-09-06",
+  "capturedAt": "2026-09-06T04:59:25.210923+00:00",
+  "statusCode": 200,
+  "capturedResourcesCount": 15,
+  "failedResourcesCount": 2,
+  "failedResources": {
+    "https://neouat.axismaxlife.com/c99a4269-161c-4242-a3f0-28d44fa6ce24?": "Body read error: Response.body: Protocol error (Network.getResponseBody): No resource with given identifier found",
+    "https://c7617ddd6d87.w.hcaptcha.com/logo.png": "Body read error: Response.body: Protocol error (Network.getResponseBody): No data found for resource with given identifier"
+  },
+  "resourceMap": {
+    "https://fonts.googleapis.com/css?family=Inter": "resources/css/css_2470dd10fb94e88d.css",
+    "https://fonts.googleapis.com/css?family=Roboto": "resources/css/css_ece6acc3bf713f32.css",
+    "https://fonts.gstatic.com/s/roboto/v51/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAr0klQmz24.woff2": "resources/fonts/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAr0klQmz24_47d952b623b612a0.woff2",
+    "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2": "resources/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA_29ede7bd4be32ab0.woff2",
+    "https://neouat.axismaxlife.com/18f5227b-e27b-445a-a53f-f845fbe69b40/stormcaster.js": "resources/js/stormcaster_acc0dc1313bef3cf.js",
+    "https://hcaptcha.com/1/api.js?recaptchacompat=off": "resources/js/api_448ba43c95f9fbc8.js",
+    "https://captcha.perfdrive.com/captcha-public/css/shieldsquare_styles.min.css": "resources/css/shieldsquare_styles_min_40679d81edb55561.css",
+    "https://captcha.perfdrive.com/captcha-public/images/ss_captcha.png": "resources/img/ss_captcha_ff885f53fd6b05af.png",
+    "https://fonts.googleapis.com/css?family=Lato": "resources/css/css_8518689457ec3e7b.css",
+    "https://cdn.perfdrive.com/aperture/aperture.js": "resources/js/aperture_662c39a8d80ad36a.js",
+    "https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXiWtFCc.woff2": "resources/fonts/S6uyw4BMUTPHjx4wXiWtFCc_23f7c01d806c2855.woff2",
+    "https://cas.avalon.perfdrive.com/jsdata?": "resources/other/jsdata_6a42e95368151108.txt",
+    "https://4c335c7c0b12.w.hcaptcha.com/logo.png": "resources/img/logo_6788c2f10d090c7d.png",
+    "https://api.hcaptcha.com/checksiteconfig?v=80ba88939126ef29d32e1ca12bb3054eb9b51927&host=validate.perfdrive.com&sitekey=ae73173b-7003-44e0-bc87-654d0dab8b75&sc=1&swa=1&spst=1": "resources/other/checksiteconfig_de9c8f8112901a23.json",
+    "https://newassets.hcaptcha.com/c/8e27e86bc4dfc41278deb0d1fdfddf1838c999c932c55499a9521c8543c3a658/hsw.js": "resources/js/hsw_63c40ea73a849874.js"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/neouat.axismaxlife.com_term-insurance-plans/2026-09-06/index.html"
+}
