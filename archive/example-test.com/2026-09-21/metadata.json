@@ -1,0 +1,18 @@
+{
+  "site": "example-test.com",
+  "url": "https://example-test.com",
+  "date": "2026-09-21",
+  "capturedAt": "2026-09-21T05:20:15.016434+00:00",
+  "statusCode": 403,
+  "capturedResourcesCount": 3,
+  "failedResourcesCount": 1,
+  "failedResources": {
+    "https://example-test.com/": "HTTP 403"
+  },
+  "resourceMap": {
+    "https://fonts.googleapis.com/css?family=Open+Sans:400,700%7CRoboto:400,700": "resources/css/css_abceddf223833045.css",
+    "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBHMdazQ.woff2": "resources/fonts/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBHMdazQ_5fac139c681d1a0c.woff2",
+    "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2": "resources/fonts/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I_fc0528d1f755a522.woff2"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/example-test.com/2026-09-21/index.html"
+}
