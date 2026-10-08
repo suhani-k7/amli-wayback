@@ -1,0 +1,21 @@
+{
+  "site": "example-test.com",
+  "url": "https://example-test.com",
+  "date": "2026-10-08",
+  "capturedAt": "2026-10-08T06:32:47.986056+00:00",
+  "statusCode": 429,
+  "capturedResourcesCount": 6,
+  "failedResourcesCount": 1,
+  "failedResources": {
+    "https://example-test.com/": "HTTP 429"
+  },
+  "resourceMap": {
+    "https://dw8ktnn3r32sp.cloudfront.net/css/systempages.css": "resources/css/systempages_7e69ea1d8eb0afc9.css",
+    "https://dw8ktnn3r32sp.cloudfront.net/img/systempages/cloud_rain.png": "resources/img/cloud_rain_f7c58ecb09512a7f.png",
+    "https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700|Montserrat:400,700&subset=latin,latin-ext": "resources/css/css_b8da8633386cca03.css",
+    "https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2": "resources/fonts/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y_c4f4a8cd0b92a14a.woff2",
+    "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2": "resources/fonts/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I_fc0528d1f755a522.woff2",
+    "https://fonts.gstatic.com/s/opensans/v44/memtYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWqWuU6FxZCJgg.woff2": "resources/fonts/memtYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWqWuU6FxZCJgg_89f3993653d4b514.woff2"
+  },
+  "indexHtmlGridFsId": "/home/runner/work/amli-wayback/amli-wayback/archive/example-test.com/2026-10-08/index.html"
+}
